@@ -1,0 +1,59 @@
+// schema.prisma
+// Prisma schema file to define database models for the application.
+
+datasource db {
+  provider = "postgresql" // Database provider, using PostgreSQL in this example
+  url      = env("DATABASE_URL") // The database URL will be loaded from the .env file
+}
+
+generator client {
+  provider = "prisma-client-js" // Use Prisma Client for interacting with the database
+}
+
+model User {
+  id        Int      @id @default(autoincrement()) // Unique identifier for the user
+  username  String   @unique // Username should be unique
+  email     String   @unique // Email should be unique
+  password  String   // Password for the user, hashed for security
+  orders    Order[]  // Relation to orders, one user can have many orders
+  reviews   Review[] // Relation to reviews, one user can have many reviews
+  createdAt DateTime @default(now()) // Timestamp when the user was created
+  updatedAt DateTime @updatedAt // Timestamp for when the user was last updated
+}
+
+model City {
+  id          Int      @id @default(autoincrement()) // Unique identifier for the city
+  name        String   // Name of the city
+  description String   // Description of the city
+  price       Float    // Price of the city (e.g., how much it costs to purchase)
+  imageUrl    String   // URL of the city's image
+  reviews     Review[] // Relation to reviews, one city can have many reviews
+  orders      Order[]  // Relation to orders, one city can be in many orders
+  createdAt   DateTime @default(now()) // Timestamp when the city was created
+  updatedAt   DateTime @updatedAt // Timestamp for when the city was last updated
+}
+
+model Review {
+  id        Int      @id @default(autoincrement()) // Unique identifier for the review
+  rating    Int      // Rating given to the city (e.g., from 1 to 5)
+  comment   String   // Review comment left by the user
+  cityId    Int      // Foreign key to the City model
+  userId    Int      // Foreign key to the User model
+  city      City     @relation(fields: [cityId], references: [id]) // Link to the City model
+  user      User     @relation(fields: [userId], references: [id]) // Link to the User model
+  createdAt DateTime @default(now()) // Timestamp when the review was created
+  updatedAt DateTime @updatedAt // Timestamp for when the review was last updated
+}
+
+model Order {
+  id        Int      @id @default(autoincrement()) // Unique identifier for the order
+  quantity  Int      // Quantity of cities in the order
+  totalPrice Float   // Total price for the order
+  status    String   // Order status (e.g., 'pending', 'shipped')
+  cityId    Int      // Foreign key to the City model
+  userId    Int      // Foreign key to the User model
+  city      City     @relation(fields: [cityId], references: [id]) // Link to the City model
+  user      User     @relation(fields: [userId], references: [id]) // Link to the User model
+  createdAt DateTime @default(now()) // Timestamp when the order was created
+  updatedAt DateTime @updatedAt // Timestamp for when the order was last updated
+}

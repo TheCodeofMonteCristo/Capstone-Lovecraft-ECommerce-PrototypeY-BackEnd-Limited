@@ -20,3 +20,6 @@ rad.json
 *.flf
 #Test results file
 TestResults.xml
+
+#Avoid sharing sensitive data
+.env
